@@ -26,18 +26,18 @@
         barLayer = layer.append("g")
             .attr("transform", "translate(" + width/2 + "," + height/2.5 + ")");
 
-            barLayer.append("text")
-                .attr("class", "bar-header")
-                .attr("x", "150")
-                .attr("y", -15)
-                .attr("text-anchor", "middle")
-                .text('Браузеры');
-            barLayer.append("text")
-                .attr("class", "bar-header")
-                .attr("x", "300")
-                .attr("y", -15)
-                .attr("text-anchor", "middle")
-                .text('% посещений');
+        barLayer.append("text")
+            .attr("class", "bar-header")
+            .attr("x", "150")
+            .attr("y", -15)
+            .attr("text-anchor", "middle")
+            .text('Браузеры');
+        barLayer.append("text")
+            .attr("class", "bar-header")
+            .attr("x", "300")
+            .attr("y", -15)
+            .attr("text-anchor", "middle")
+            .text('% посещений');
 
         Object.keys(data).forEach(function(element) {
 
@@ -45,23 +45,25 @@
 
             currentData = data;
 
-            sum = summary(obj);
+            sum = base.summary(obj);
 
-            total = findTotal(data);
+            total = base.findTotal(data);
 
-            persentage = findPercentage(total, sum);
+            persentage = base.findPercentage(total, sum);
 
-            arr = fillArray(obj, sum);
+            arr = base.fillArray(obj, sum);
 
             n = n+30;
 
             if (defaultBrowser) {
-                drawPie(arr, element);
+                drawPie(obj, element);
                 defaultBrowser = false;
             }
 
             //необходимо ассоциировать диаграмму с данными
-            var barGroup = barLayer.data([obj]).append("g");
+            var barGroup = barLayer.data([obj])
+                .append("g")
+                .attr('class', 'bar-chart');
 
             barGroup.append("text")
                 .attr("class", "link " + element)
@@ -70,31 +72,26 @@
                 .attr("y", n)
                 .attr("text-anchor", "middle")
                 .style("fill", function() {return colorText(element) })
-                .text(function() {return showNormalName(element)})
+                .text(function() {return base.showNormalName(element)})
                 .on("click", function() {
                     var attr = this.getAttribute("name");
                     var currentBrowser;
-
                     //строим круговую диаграмму по совпавшим данным
-                    d3.entries(currentData).forEach(function() {
+                    Object.keys(currentData).forEach(function(element) {
                         if (element === attr) {
-                            var arr = fillArray(currentData[element], summary(currentData[element]));
                             currentBrowser = element;
                             pieLayer.remove();
                             centerLayer.remove();
-                            drawPie(arr, currentBrowser);
+                            drawPie(currentData[element], currentBrowser);
                         }
                     });
                 })
                 .on("mouseover", function(d) {
-                    console.log();
-                    d3.select(this.nextSibling).text(summary(d));
+                    d3.select(this.nextSibling).text(base.summary(d).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "));
                 })
                 .on("mouseout", function(d) {
-                    console.log(persentage);
-                    console.log(d);
-                    console.log(findPercentage(total, summary(d)));
-                    d3.select(this.nextSibling).text(function() { return findPercentage(total, summary(d))+'%';});
+                    d3.select(this.nextSibling)
+                        .text(function() { return base.findPercentage(total, base.summary(d))+'%';});
                 });
 
             barGroup.append("text")
@@ -126,10 +123,10 @@
     }
 
     //построение круговой диаграммы
-    function drawPie(arr, element) {
-
-        var posFactor = null;
-        var hoverText, pos;
+    function drawPie(obj, element) {
+        var posFactor = null,
+            arr = base.fillArray(obj, base.summary(obj)),
+            hoverText, pos;
 
         //анимация каждого отрезка('арки') диаграммы
         function tweenPie(b) {
@@ -223,7 +220,7 @@
             .style("text-anchor", "middle")
             .attr('class', 'header')
             .text(function(d){
-                return showNormalName(element);
+                return base.showNormalName(element);
             });
         centerLayer.append("text")
             .attr("dy", 0)
@@ -232,7 +229,7 @@
             .attr('class', 'summary')
             .text('Общее число посещений:');
         centerLayer.append("text")
-            .text(summary(obj))
+            .text(base.summary(obj).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "))
             .attr("dy", 15)
             .style('fill', '#515151')
             .style("text-anchor", "middle")

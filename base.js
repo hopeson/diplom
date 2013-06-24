@@ -1,38 +1,40 @@
-function summary(obj) {
-    var result = 0;
+var base = (function() {
 
-    Object.keys(obj).forEach(function(key) {
-        result += obj[ key ];
-    });
+    return {
+        summary: function(obj) {
+            var result = 0;
 
-    return result;
-}
+            Object.keys(obj).forEach(function(key) {
+                result += obj[ key ];
+            });
 
-function findTotal(obj) {
-    var result = 0;
-    Object.keys(obj).forEach(function(key) {
-        result += summary(obj[ key ]);
-    });
+            return result;
+        },
+        findTotal: function(obj) {
+            var result = 0;
+            Object.keys(obj).forEach(function(key) {
+                result += base.summary(obj[ key ]);
+            });
 
-    return result;
-}
+            return result;
+        },
+        findPercentage: function(total, part) {
+            return +((part * 100)/total).toFixed(2);
+        },
+        fillArray: function(obj, sum) {
+            var arr = [];
 
-function findPercentage(total, part) {
-    return +((part * 100)/total).toFixed(2);
-}
+            Object.keys(obj).forEach(function(element){
+                var persentage = base.findPercentage(sum, obj[element]);
 
-function fillArray(obj, sum) {
-    var arr = [];
+                arr.push({"named": element, "value": obj[element], "percent": persentage});
+            });
 
-    Object.keys(obj).forEach(function(element){
-        var persentage = findPercentage(sum, obj[element]);
+            return arr;
+        },
+        showNormalName: function(element){
+            return element.charAt(0).toUpperCase() + element.replace(/_/, ' ').slice(1);
+        }
+    };
 
-        arr.push({"named": element, "value": obj[element], "percent": persentage});
-    });
-
-    return arr;
-}
-
-function showNormalName(element){
-    return element.charAt(0).toUpperCase() + element.replace(/_/, ' ').slice(1);
-}
+})();
