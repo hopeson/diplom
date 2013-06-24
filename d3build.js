@@ -8,6 +8,7 @@
         pieLayer, centerLayer, barLayer, arc,
         obj, currentData, defaultBrowser, arr = [];
 
+    //общий svg для для диаграмм
     var layer = d3.select(".main").append("svg")
         .attr("width", width)
         .attr("height", height);
@@ -15,6 +16,7 @@
 
     createBarchart (parsedData);
 
+    //построение столбчатой диаграммы
     function createBarchart (data) {
         var n = 0,
             sum, total, persentage;
@@ -58,7 +60,7 @@
                 defaultBrowser = false;
             }
 
-
+            //необходимо ассоциировать диаграмму с данными
             var barGroup = barLayer.data([obj]).append("g");
 
             barGroup.append("text")
@@ -72,6 +74,8 @@
                 .on("click", function() {
                     var attr = this.getAttribute("name");
                     var currentBrowser;
+
+                    //строим круговую диаграмму по совпавшим данным
                     d3.entries(currentData).forEach(function() {
                         if (element === attr) {
                             var arr = fillArray(currentData[element], summary(currentData[element]));
@@ -117,11 +121,13 @@
         });
     }
 
+    //построение круговой диаграммы
     function drawPie(arr, element) {
 
         var posFactor = null;
         var hoverText, pos;
 
+        //анимация каждого отрезка('арки') диаграммы
         function tweenPie(b) {
             b.innerRadius = 0;
             var i = d3.interpolate({startAngle: 0, endAngle: 0}, b);
@@ -130,6 +136,7 @@
             };
         }
 
+        //коэфициент отдаления(подписи,линии) от диаграммы
         function countLabelPosition(current) {
             if(current < 0.01){
                 posFactor = 45;
@@ -160,10 +167,12 @@
             .attr("d", arc)
             .on('mouseover', function(d) {
                 var thisArc = d3.select(this);
+
                 arcGroup.selectAll("path").style('opacity', '0.5');
                 arcGroup.selectAll("text").style('opacity', '0.3');
                 thisArc.selectAll("path").style('opacity', '1');
                 thisArc.selectAll("text").style('opacity', '1');
+
                 hoverText = centerLayer.append("g")
                     .attr('class', 'version');
                 hoverText.append('text')
@@ -241,6 +250,8 @@
                 return -radius-posFactor+8;
             });
 
+        //полупрозрачная подложка под подписи,
+        // так как для svg элемента <text> нельзя задать фон
         arcGroup.append("line")
             .attr("x1", function(d) { return (d.endAngle + d.startAngle)/2 > Math.PI
                 ? -20
@@ -270,6 +281,8 @@
             .text(function(d) { return d.data.percent+'%'; })
             .attr("transform", function(d) {
                 var arcWidth = d.endAngle - d.startAngle;
+
+                //отдалять подписи от диаграммы по мере их плотности
                 countLabelPosition(arcWidth);
                 pos = d3.svg.arc().innerRadius(radius + posFactor).outerRadius(radius + posFactor);
                 return "translate(" + pos.centroid(d) + ")";
