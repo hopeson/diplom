@@ -87,10 +87,14 @@
                     });
                 })
                 .on("mouseover", function(d) {
+                    console.log();
                     d3.select(this.nextSibling).text(summary(d));
                 })
-                .on("mouseout", function() {
-                    d3.select(this.nextSibling).text(persentage+'%');
+                .on("mouseout", function(d) {
+                    console.log(persentage);
+                    console.log(d);
+                    console.log(findPercentage(total, summary(d)));
+                    d3.select(this.nextSibling).text(function() { return findPercentage(total, summary(d))+'%';});
                 });
 
             barGroup.append("text")
