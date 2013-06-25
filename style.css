@@ -1,15 +1,17 @@
 body
 {
     font-family: Helvetica , sans-serif;
-    color: #000;
     font-size: 14px;
+
     text-align: center;
+
+    color: #000;
 }
 
 .main
 {
-    margin: auto;
     width: 1000px;
+    margin: auto;
 }
 
 .header
@@ -31,6 +33,7 @@ body
 .label
 {
     padding: 5px 10px;
+
     border: 1px solid #cecece;
     background: -webkit-linear-gradient(top, rgba(247,247,252,1) 46%,rgba(221,223,227,1) 100%,rgba(245,246,246,1) 100%);
 }
@@ -54,10 +57,10 @@ body
 
 .desktop
 {
+    margin-right: -5px;
+
     -webkit-border-radius: 3px 0 0 3px;
     border-radius: 3px 0 0 3px;
-
-    margin-right: -5px;
 }
 
 .bar-chart
@@ -93,13 +96,15 @@ body
 
 .summary
 {
-    text-transform: lowercase;
     font-size: 12px;
+
+    text-transform: lowercase;
 }
 
 .version
 {
-    text-transform: lowercase;
     font-size: 14px;
     font-weight: bold;
+
+    text-transform: lowercase;
 }
