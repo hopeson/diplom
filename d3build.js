@@ -8,7 +8,7 @@
         pieLayer, centerLayer, barLayer, arc,
         obj, currentData, defaultBrowser, arr = [];
 
-    //общий svg для для диаграмм
+    //общий svg для диаграмм
     var layer = d3.select(".main").append("svg")
         .attr("width", width)
         .attr("height", height);
@@ -31,13 +31,13 @@
             .attr("x", "150")
             .attr("y", -15)
             .attr("text-anchor", "middle")
-            .text('Браузеры');
+            .text("Браузеры");
         barLayer.append("text")
             .attr("class", "bar-header")
             .attr("x", "300")
             .attr("y", -15)
             .attr("text-anchor", "middle")
-            .text('% посещений');
+            .text("% посещений");
 
         Object.keys(data).forEach(function(element) {
 
@@ -63,44 +63,25 @@
             //необходимо ассоциировать диаграмму с данными
             var barGroup = barLayer.data([obj])
                 .append("g")
-                .attr('class', 'bar-chart');
+                .attr("class", "bar-chart");
 
             barGroup.append("text")
                 .attr("class", "link " + element)
-                .attr('name', element)
+                .attr("name", element)
                 .attr("x", "150")
+                .attr("width", 300)
                 .attr("y", n)
                 .attr("text-anchor", "middle")
                 .style("fill", function() {return colorText(element) })
-                .text(function() {return base.showNormalName(element)})
-                .on("click", function() {
-                    var attr = this.getAttribute("name");
-                    var currentBrowser;
-                    //строим круговую диаграмму по совпавшим данным
-                    Object.keys(currentData).forEach(function(element) {
-                        if (element === attr) {
-                            currentBrowser = element;
-                            pieLayer.remove();
-                            centerLayer.remove();
-                            drawPie(currentData[element], currentBrowser);
-                        }
-                    });
-                })
-                .on("mouseover", function(d) {
-                    d3.select(this.nextSibling).text(base.summary(d).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "));
-                })
-                .on("mouseout", function(d) {
-                    d3.select(this.nextSibling)
-                        .text(function() { return base.findPercentage(total, base.summary(d))+'%';});
-                });
+                .text(function() {return base.showNormalName(element)});
 
             barGroup.append("text")
-                .attr("class", "numder")
+                .attr("class", "number")
                 .attr("x", "400")
                 .attr("y", n)
                 .attr("text-anchor", "middle")
-                .style("fill", 'grey')
-                .text(persentage+'%');
+                .style("fill", "grey")
+                .text(persentage+"%");
 
             barGroup.append("rect")
                 .attr("fill", "#eee")
@@ -113,12 +94,33 @@
                 .style("fill", function() {return colorText(persentage) })
                 .attr("x", "250")
                 .attr("y", n-15)
-                .attr('width', 0)
+                .attr("width", 0)
                 .transition()
                 .ease("elastic")
                 .duration(3000)
                 .attr("width", persentage)
                 .attr("height",20);
+
+
+            d3.selectAll(".bar-chart")
+                .on("click", function() {
+                    var attr = d3.select(this).select(".link").attr("name"),
+                        data = d3.select(this).select(".link").data();
+
+                    pieLayer.remove();
+                    centerLayer.remove();
+
+                    //строим круговую диаграмму по совпавшим данным
+                    drawPie(data[0], attr);
+                })
+                .on("mouseover", function(d) {
+                    d3.select(this).select(".number")
+                        .text(base.summary(d).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "));
+                })
+                .on("mouseout", function(d) {
+                    d3.select(this).select(".number")
+                        .text(function() { return base.findPercentage(total, base.summary(d))+"%";});
+                });
         });
     }
 
@@ -128,9 +130,8 @@
             arr = base.fillArray(obj, base.summary(obj)),
             hoverText, pos;
 
-        //анимация каждого отрезка('арки') диаграммы
+        //анимация каждого отрезка("арки") диаграммы
         function tweenPie(b) {
-            b.innerRadius = 0;
             var i = d3.interpolate({startAngle: 0, endAngle: 0}, b);
             return function(t) {
                 return arc(i(t));
@@ -150,7 +151,7 @@
         }
 
         pieLayer = layer.data([arr])
-            .append('g')
+            .append("g")
             .attr("transform", "translate(" + width/3.5 + "," + height/1.8 + ")");
 
         arc = d3.svg.arc()
@@ -166,38 +167,38 @@
             .enter().append("g")
             .attr("class", "arc")
             .attr("d", arc)
-            .on('mouseover', function(d) {
+            .on("mouseover", function(d) {
                 var thisArc = d3.select(this);
 
-                arcGroup.selectAll("path").style('opacity', '0.5');
-                arcGroup.selectAll("text").style('opacity', '0.3');
-                thisArc.selectAll("path").style('opacity', '1');
-                thisArc.selectAll("text").style('opacity', '1');
+                arcGroup.selectAll("path").style("opacity", "0.5");
+                arcGroup.selectAll("text").style("opacity", "0.3");
+                thisArc.selectAll("path").style("opacity", "1");
+                thisArc.selectAll("text").style("opacity", "1");
 
                 hoverText = centerLayer.append("g")
-                    .attr('class', 'version');
-                hoverText.append('text')
+                    .attr("class", "version");
+                hoverText.append("text")
                     .style("text-anchor", "middle")
                     .attr("dy",-200)
                     .transition()
                     .ease("elastic")
                     .delay(100)
                     .attr("dy", 40)
-                    .style('fill', '#666')
-                    .text('Версия: '+ d.data.named);
-                hoverText.append('text')
+                    .style("fill", "#666")
+                    .text("Версия: "+ d.data.named);
+                hoverText.append("text")
                     .style("text-anchor", "middle")
                     .attr("dy",-200)
                     .transition()
                     .ease("elastic")
                     .delay(500)
                     .attr("dy", 55)
-                    .style('fill', '#666')
-                    .text('Посещений: '+ d.value);
+                    .style("fill", "#666")
+                    .text("Посещений: "+ d.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "));
             })
-            .on('mouseout', function(d) {
-                arcGroup.selectAll("path").style('opacity', '1');
-                arcGroup.selectAll("text").style('opacity', '1');
+            .on("mouseout", function(d) {
+                arcGroup.selectAll("path").style("opacity", "1");
+                arcGroup.selectAll("text").style("opacity", "1");
                 hoverText.remove();
             });
 
@@ -218,22 +219,22 @@
         centerLayer.append("text")
             .attr("dy", -25)
             .style("text-anchor", "middle")
-            .attr('class', 'header')
+            .attr("class", "header")
             .text(function(d){
                 return base.showNormalName(element);
             });
         centerLayer.append("text")
             .attr("dy", 0)
             .style("text-anchor", "middle")
-            .style('fill', '#515151')
-            .attr('class', 'summary')
-            .text('Общее число посещений:');
+            .style("fill", "#515151")
+            .attr("class", "summary")
+            .text("Общее число посещений:");
         centerLayer.append("text")
             .text(base.summary(obj).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "))
             .attr("dy", 15)
-            .style('fill', '#515151')
+            .style("fill", "#515151")
             .style("text-anchor", "middle")
-            .attr('class', 'summary');
+            .attr("class", "summary");
 
         arcGroup.append("line")
             .attr("x1", 0)
@@ -262,9 +263,9 @@
                 ? -20
                 : 20;
             })
-            .style('stroke-opacity', 0.6)
+            .style("stroke-opacity", 0.6)
             .attr("y2", 8)
-            .attr('y1', -8)
+            .attr("y1", -8)
             .attr("stroke", "#fff")
             .attr("transform", function(d) {
                 var arcWidth = d.endAngle - d.startAngle;
@@ -275,11 +276,11 @@
             .attr("stroke-width", 40);
 
         arcGroup.append("text")
-            .style('opacity', 0)
+            .style("opacity", 0)
             .transition()
             .duration(2000)
-            .style('opacity', 1)
-            .text(function(d) { return d.data.percent+'%'; })
+            .style("opacity", 1)
+            .text(function(d) { return d.data.percent+"%"; })
             .attr("transform", function(d) {
                 var arcWidth = d.endAngle - d.startAngle;
 
@@ -289,22 +290,22 @@
                 return "translate(" + pos.centroid(d) + ")";
             })
             .attr("dy", ".35em")
-            .attr('class', 'arc-label')
+            .attr("class", "arc-label")
             .attr("text-anchor", function(d) { return (d.endAngle + d.startAngle)/2 > Math.PI
                 ? "end"
                 : "start";
             });
     }
 
-    d3.select('.mobile')
-        .on('click', function(){
+    d3.select(".mobile")
+        .on("click", function(){
             pieLayer.remove();
             centerLayer.remove();
             barLayer.remove();
             createBarchart (parsedDatamob);
         });
-    d3.select('.desktop')
-        .on('click', function(){
+    d3.select(".desktop")
+        .on("click", function(){
             pieLayer.remove();
             centerLayer.remove();
             barLayer.remove();
